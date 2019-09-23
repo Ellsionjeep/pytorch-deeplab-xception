@@ -175,6 +175,18 @@ class Trainer(object):
                 'best_pred': self.best_pred,
             }, is_best)
 
+'''
+python train.py --backbone resnet \
+--lr 0.007 \
+--workers 0 \
+--epochs 50 \
+--batch-size 16 \
+--gpu-ids 0 \
+--checkname deeplab-resnet \
+--eval-interval 1 \
+--dataset pascal
+'''
+
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
     parser.add_argument('--backbone', type=str, default='resnet',
@@ -185,9 +197,9 @@ def main():
     parser.add_argument('--dataset', type=str, default='pascal',
                         choices=['pascal', 'coco', 'cityscapes'],
                         help='dataset name (default: pascal)')
-    parser.add_argument('--use-sbd', action='store_true', default=True,
+    parser.add_argument('--use-sbd', action='store_true', default=False,
                         help='whether to use SBD dataset (default: True)')
-    parser.add_argument('--workers', type=int, default=4,
+    parser.add_argument('--workers', type=int, default=0,
                         metavar='N', help='dataloader threads')
     parser.add_argument('--base-size', type=int, default=513,
                         help='base image size')
@@ -201,11 +213,11 @@ def main():
                         choices=['ce', 'focal'],
                         help='loss func type (default: ce)')
     # training hyper params
-    parser.add_argument('--epochs', type=int, default=None, metavar='N',
+    parser.add_argument('--epochs', type=int, default=50, metavar='N',
                         help='number of epochs to train (default: auto)')
     parser.add_argument('--start_epoch', type=int, default=0,
                         metavar='N', help='start epochs (default:0)')
-    parser.add_argument('--batch-size', type=int, default=None,
+    parser.add_argument('--batch-size', type=int, default=8,
                         metavar='N', help='input batch size for \
                                 training (default: auto)')
     parser.add_argument('--test-batch-size', type=int, default=None,
@@ -236,10 +248,10 @@ def main():
     # checking point
     parser.add_argument('--resume', type=str, default=None,
                         help='put the path to resuming file if needed')
-    parser.add_argument('--checkname', type=str, default=None,
+    parser.add_argument('--checkname', type=str, default='deeplab-resnet',
                         help='set the checkpoint name')
     # finetuning pre-trained models
-    parser.add_argument('--ft', action='store_true', default=False,
+    parser.add_argument('--ft', action='store_true', default=True,
                         help='finetuning on a different dataset')
     # evaluation option
     parser.add_argument('--eval-interval', type=int, default=1,

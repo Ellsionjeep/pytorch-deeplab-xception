@@ -10,8 +10,12 @@ from dataloaders import custom_transforms as tr
 class VOCSegmentation(Dataset):
     """
     PascalVoc dataset
+    111, 112, 121, 131, 151, 152, 153, 154, 155, 161,
+    162, 163, 211, 212, 221, 222, 231, 241, 251, 252,
+    421, 422, 423, 511, 521, 522, 611, 612, 613, 622,
+    623, 711, 712, 721
     """
-    NUM_CLASSES = 41
+    NUM_CLASSES = 42
 
     def __init__(self,
                  args,
