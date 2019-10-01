@@ -97,11 +97,15 @@ class Trainer(object):
         num_img_tr = len(self.train_loader)
         for i, sample in enumerate(tbar):
             image, target = sample['image'], sample['label']
+            
             if self.args.cuda:
                 image, target = image.cuda(), target.cuda()
+            if image.shape[0] == 1:
+                continue
             self.scheduler(self.optimizer, i, epoch, self.best_pred)
             self.optimizer.zero_grad()
             output = self.model(image)
+            #print(output.shape, target.shape)
             loss = self.criterion(output, target)
             loss.backward()
             self.optimizer.step()
