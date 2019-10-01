@@ -71,17 +71,6 @@ class Tester(object):
         Acc_class = self.evaluator.Pixel_Accuracy_Class()
         print('Acc:{}, Acc_class:{}'.format(Acc, Acc_class))
 
-'''
-python3 test.py \
---test \
---backbone xception \
---dataset pascal \
---out_stride 16 \
---crop_size 513 \
---model /Users/jaeminjung/develop/aidentify/MoE_ws/result/cheonan_24/model_best.pth.tar \
---save_path /Users/jaeminjung/develop/aidentify/MoE_ws/result/20191001_img
-'''
-
 def main():
     parser = argparse.ArgumentParser(description='Pytorch DeeplabV3Plus Test your data')
     parser.add_argument('--test', action='store_true', default=True, 
