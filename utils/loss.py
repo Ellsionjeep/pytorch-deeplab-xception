@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from parallel import DataParallelCriterion
 
 class SegmentationLosses(object):
     def __init__(self, weight=None, size_average=True, batch_average=True, ignore_index=255, cuda=False):
@@ -22,9 +23,12 @@ class SegmentationLosses(object):
         n, c, h, w = logit.size()
         criterion = nn.CrossEntropyLoss(weight=self.weight, ignore_index=self.ignore_index,
                                         size_average=self.size_average)
-        if self.cuda:
+        
+        if self.cuda and len(self.args.gpu_ids) > 1:
+            criterion = DataParallelCriterion(criterion)
+        if self.cuda and len(self.args.gpu_ids) < 2:
             criterion = criterion.cuda()
-
+        
         loss = criterion(logit, target.long())
 
         if self.batch_average:
