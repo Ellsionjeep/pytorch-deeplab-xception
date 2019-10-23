@@ -7,7 +7,6 @@ from mypath import Path
 from dataloaders import make_data_loader
 from modeling.sync_batchnorm.replicate import patch_replication_callback
 from modeling.deeplab import *
-from utils.parallel import DataParallelModel
 from utils.loss import SegmentationLosses
 from utils.calculate_weights import calculate_weigths_labels
 from utils.lr_scheduler import LR_Scheduler
@@ -55,12 +54,8 @@ class Trainer(object):
             weight = torch.from_numpy(weight.astype(np.float32))
         else:
             weight = None
-        self.criterion = SegmentationLosses(weight=weight, cuda=args.cuda).build_loss(mode=args.loss_type) 
-        if len(args.gpu_ids) > 1:
-            self.model = DataParallelModel(model)
-        else:
-            self.model = model
-        self.optimizer = optimizer
+        self.criterion = SegmentationLosses(weight=weight, cuda=args.cuda).build_loss(mode=args.loss_type)
+        self.model, self.optimizer = model, optimizer
         
         # Define Evaluator
         self.evaluator = Evaluator(self.nclass)
@@ -70,8 +65,8 @@ class Trainer(object):
 
         # Using cuda
         if args.cuda:
-            # self.model = torch.nn.DataParallel(self.model, device_ids=self.args.gpu_ids)
-            # patch_replication_callback(self.model)
+            self.model = torch.nn.DataParallel(self.model, device_ids=self.args.gpu_ids)
+            patch_replication_callback(self.model)
             self.model = self.model.cuda()
 
         # Resuming checkpoint
@@ -105,8 +100,8 @@ class Trainer(object):
             
             if self.args.cuda:
                 image, target = image.cuda(), target.cuda()
-            if image.shape[0] == 1:
-                continue
+            #if image.shape[0] == 1:
+            #   continue
             self.scheduler(self.optimizer, i, epoch, self.best_pred)
             self.optimizer.zero_grad()
             output = self.model(image)
@@ -174,6 +169,12 @@ class Trainer(object):
         print('Loss: %.3f' % test_loss)
 
         new_pred = mIoU
+        self.saver.save_checkpoint({
+                'epoch': epoch + 1,
+                'state_dict': self.model.module.state_dict(),
+                'optimizer': self.optimizer.state_dict(),
+                'best_pred': self.best_pred,
+            }, False, filename=str(epoch+1)+'_checkpoint.pth.tar')
         if new_pred > self.best_pred:
             is_best = True
             self.best_pred = new_pred
@@ -267,7 +268,6 @@ def main():
                         help='evaluuation interval (default: 1)')
     parser.add_argument('--no-val', action='store_true', default=False,
                         help='skip validation during training')
-    # test option
     parser.add_argument('--test', action='store_true', default=False,
                         help='test option')
 

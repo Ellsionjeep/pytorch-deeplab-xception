@@ -83,9 +83,9 @@ def main():
                         help='output stride')
     parser.add_argument('--crop_size', type=int, default=513,
                         help='image size')
-    parser.add_argument('--model', type=str, default='/Users/jaeminjung/develop/aidentify/MoE_ws/result/cheonan_24/model_best.pth.tar',
+    parser.add_argument('--model', type=str, default='',
                         help='load your model')
-    parser.add_argument('--save_path', type=str, default='/Users/jaeminjung/develop/aidentify/MoE_ws/result/20191001_img',
+    parser.add_argument('--save_path', type=str, default='',
                         help='save your prediction data')
 
     args = parser.parse_args()
