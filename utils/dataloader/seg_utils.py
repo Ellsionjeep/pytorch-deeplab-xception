@@ -1,34 +1,17 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-def decode_seg_map_sequence(label_masks, dataset='pascal'):
+def decode_seg_map_sequence(label_masks, num_class):
     rgb_masks = []
     for label_mask in label_masks:
-        rgb_mask = decode_segmap(label_mask, dataset)
+        rgb_mask = decode_segmap(label_mask, num_class)
         rgb_masks.append(rgb_mask)
     rgb_masks = torch.from_numpy(np.array(rgb_masks).transpose([0, 3, 1, 2]))
     return rgb_masks
 
 
-def decode_segmap(label_mask, dataset, plot=False):
-    """Decode segmentation class labels into a color image
-    Args:
-        label_mask (np.ndarray): an (M,N) array of integer values denoting
-          the class label at each spatial location.
-        plot (bool, optional): whether to show the resulting color image
-          in a figure.
-    Returns:
-        (np.ndarray, optional): the resulting decoded color image.
-    """
-    if dataset == 'pascal' or dataset == 'coco':
-        n_classes = 42
-        label_colours = get_pascal_labels()
-    elif dataset == 'cityscapes':
-        n_classes = 19
-        label_colours = get_cityscapes_labels()
-    else:
-        raise NotImplementedError
+def decode_segmap(label_mask, num_class):
+    n_classes = num_class
 
     r = label_mask.copy()
     g = label_mask.copy()
@@ -41,11 +24,8 @@ def decode_segmap(label_mask, dataset, plot=False):
     rgb[:, :, 0] = r / 255.0
     rgb[:, :, 1] = g / 255.0
     rgb[:, :, 2] = b / 255.0
-    if plot:
-        plt.imshow(rgb)
-        plt.show()
-    else:
-        return rgb
+
+    return rgb
 
 
 def encode_segmap(mask):
@@ -93,25 +73,9 @@ def get_pascal_labels():
     Returns:
         np.ndarray with dimensions (21, 3)
     """
-    return np.asarray([[0, 0, 0],
-        [254, 230, 194], [223, 193, 111],
-    [192, 132, 132], [237, 131, 184],
-    [223, 176, 164], [246, 113, 138],
-    [229, 38, 254], [197, 50, 81],
-    [252, 4, 78], [247, 65, 42],
-    [190, 0 ,0], [246, 177, 18],
-    [255, 122, 0], [199, 88, 27],
-    [255, 255, 191], [244, 230, 168],
-    [247, 249, 102], [245, 228, 10],
-    [223, 220, 115], [184, 177, 44],
-    [184, 145, 18], [170, 100, 0],
-    [51, 160, 44], [10, 79, 64],
-    [51, 102, 51], [161, 213, 148],
-    [128, 228, 90], [113, 176, 90],
-    [96, 126, 51], [180, 167, 208],
-    [153, 116, 153], [124, 30, 162],
-    [193, 219, 236], [171, 197, 202],
-    [171, 182, 165], [88, 90, 138],
-    [123, 181, 172], [159, 242, 255],
-    [62, 167, 255], [93, 109, 255],
-    [23, 57, 255]])
+    return np.asarray([[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                       [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                       [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                       [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                       [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                       [0, 64, 128]])

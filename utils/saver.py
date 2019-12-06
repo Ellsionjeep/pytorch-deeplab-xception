@@ -8,7 +8,7 @@ class Saver(object):
 
     def __init__(self, args):
         self.args = args
-        self.directory = os.path.join('run', args.dataset, args.checkname)
+        self.directory = os.path.join(args.save_path, args.checkname)
         self.runs = sorted(glob.glob(os.path.join(self.directory, 'experiment_*')))
         run_id = int(self.runs[-1].split('_')[-1]) + 1 if self.runs else 0
 
@@ -45,7 +45,6 @@ class Saver(object):
         logfile = os.path.join(self.experiment_dir, 'parameters.txt')
         log_file = open(logfile, 'w')
         p = OrderedDict()
-        p['datset'] = self.args.dataset
         p['backbone'] = self.args.backbone
         p['out_stride'] = self.args.out_stride
         p['lr'] = self.args.lr

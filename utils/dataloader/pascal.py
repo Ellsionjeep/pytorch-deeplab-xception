@@ -1,11 +1,12 @@
 from __future__ import print_function, division
 import os
-from PIL import Image
 import numpy as np
+
+from PIL import Image
 from torch.utils.data import Dataset
-from mypath import Path
 from torchvision import transforms
-from dataloaders import custom_transforms as tr
+
+from utils.dataloader import custom_transforms as tr
 
 class VOCSegmentation(Dataset):
     """
@@ -15,11 +16,9 @@ class VOCSegmentation(Dataset):
     421, 422, 423, 511, 521, 522, 611, 612, 613, 622,
     623, 711, 712, 721
     """
-    NUM_CLASSES = 42
 
     def __init__(self,
                  args,
-                 base_dir=Path.db_root_dir('pascal'),
                  split='train',
                  ):
         """
@@ -28,7 +27,7 @@ class VOCSegmentation(Dataset):
         :param transform: transform to apply
         """
         super().__init__()
-        self._base_dir = base_dir
+        self._base_dir = args.data_path
         self._image_dir = os.path.join(self._base_dir, 'JPEGImages')
         self._cat_dir = os.path.join(self._base_dir, 'SegmentationClass')
 
@@ -77,7 +76,7 @@ class VOCSegmentation(Dataset):
                 return self.transform_tr(sample)
             elif split == 'val':
                 return self.transform_val(sample)
-            elif split == 'test':
+            elif split == 'inference':
                 return self.transform_val(sample)
 
 
@@ -89,9 +88,6 @@ class VOCSegmentation(Dataset):
 
     def transform_tr(self, sample):
         composed_transforms = transforms.Compose([
-            #tr.RandomHorizontalFlip(),
-            #tr.RandomScaleCrop(base_size=self.args.base_size, crop_size=self.args.crop_size),
-            #tr.RandomGaussianBlur(),
             tr.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             tr.ToTensor()])
 
@@ -100,7 +96,6 @@ class VOCSegmentation(Dataset):
     def transform_val(self, sample):
 
         composed_transforms = transforms.Compose([
-            tr.FixScaleCrop(crop_size=self.args.crop_size),
             tr.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             tr.ToTensor()])
 
@@ -108,44 +103,4 @@ class VOCSegmentation(Dataset):
 
     def __str__(self):
         return 'VOC2012(split=' + str(self.split) + ')'
-
-
-if __name__ == '__main__':
-    from dataloaders.utils import decode_segmap
-    from torch.utils.data import DataLoader
-    import matplotlib.pyplot as plt
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-    args.base_size = 513
-    args.crop_size = 513
-
-    voc_train = VOCSegmentation(args, split='train')
-
-    dataloader = DataLoader(voc_train, batch_size=5, shuffle=True, num_workers=0)
-
-    for ii, sample in enumerate(dataloader):
-        for jj in range(sample["image"].size()[0]):
-            img = sample['image'].numpy()
-            gt = sample['label'].numpy()
-            tmp = np.array(gt[jj]).astype(np.uint8)
-            segmap = decode_segmap(tmp, dataset='pascal')
-            img_tmp = np.transpose(img[jj], axes=[1, 2, 0])
-            img_tmp *= (0.229, 0.224, 0.225)
-            img_tmp += (0.485, 0.456, 0.406)
-            img_tmp *= 255.0
-            img_tmp = img_tmp.astype(np.uint8)
-            plt.figure()
-            plt.title('display')
-            plt.subplot(211)
-            plt.imshow(img_tmp)
-            plt.subplot(212)
-            plt.imshow(segmap)
-
-        if ii == 1:
-            break
-
-    plt.show(block=True)
-
 
