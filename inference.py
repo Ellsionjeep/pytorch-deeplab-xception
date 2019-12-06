@@ -16,7 +16,7 @@ from torchvision import transforms
 class Tester(object):
     def __init__(self, args):
         if not os.path.isfile(args.model):
-            raise RuntimeError("no checkpoint found at '{}'".fromat(args.model))
+            raise RuntimeError("no checkpoint found at '{}'".format(args.model))
         self.args = args
         self.color_map = seg_utils.get_pascal_labels()
         self.nclass = args.num_class
