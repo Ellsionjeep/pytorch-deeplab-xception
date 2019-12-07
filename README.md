@@ -8,6 +8,9 @@
 
 **Update on 2019/12/07. Add dockerfile and ainize Service**
 
+[![Run on Ainize](https://ainize.ai/static/images/run_on_ainize_button.svg)](https://ainize.web.app/redirect?git_repo=github.com/jaemin93/pytorch-deeplab-xception)
+
+
 <a href="#Docker">Docker</a><br>
 
 ### TODO
