@@ -32,8 +32,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='gray to rgb')
-    parser.add_argument('--data', default='./data', help='gray')
-    parser.add_argument('--ref', default='./result/inference_img_gray', help='gray')
-    parser.add_argument('--save', default='./result/inference_img_crop', help='save crop')
+    parser.add_argument('--data', default='/workspace/images', help='image')
+    parser.add_argument('--ref', default='/result/inference_img_gray', help='gray')
+    parser.add_argument('--save', default='/result/inference_img_crop', help='save crop')
     args = parser.parse_args()
     main(args)

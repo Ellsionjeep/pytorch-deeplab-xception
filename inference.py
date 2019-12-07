@@ -61,7 +61,7 @@ class Tester(object):
         DATA_DIR = self.args.data_path
         SAVE_DIR = self.args.save_path
                         
-        # 테스트할 .tif 항공정사영상 사진 로드
+        
         for idx, test_file in enumerate(os.listdir(DATA_DIR)):
             if test_file == '.DS_Store':
                 continue
@@ -112,8 +112,8 @@ def main():
     tester = Tester(args)
 
     if args.inference:
+        print('predict...')
         tester.inference()
-
 
 if __name__ == "__main__":
     main()

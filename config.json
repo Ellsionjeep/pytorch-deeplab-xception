@@ -5,8 +5,8 @@
         "backbone": "resnet",
         "out_stride": 16,
         "crop_size": 513, 
-        "data_path": "./data",
-        "save_path": "./result/inference_img_gray",
+        "data_path": "/workspace/images",
+        "save_path": "/result/inference_img_gray",
         "model": "deeplab-resnet.pth.tar"
     }
 }
